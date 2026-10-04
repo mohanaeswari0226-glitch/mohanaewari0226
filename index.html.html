@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Math Worksheet Cubby</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&family=Architects+Daughter&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F4EC;
+    --paper-line:#DCD5C2;
+    --ink:#2B2A26;
+    --chalk:#1F3D2B;
+    --kg:#F2A93B;
+    --kg-soft:#FCEBC9;
+    --g1:#2E93A6;
+    --g1-soft:#DBEFF2;
+    --g2:#E15B4F;
+    --g2-soft:#FBE1DD;
+    --g3:#7458B5;
+    --g3-soft:#E8E1F7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 42px;
+    font-family:'Nunito', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .hidden{display:none !important;}
+
+  /* ---------- Top brand bar ---------- */
+  .top-bar{
+    display:flex;align-items:center;justify-content:center;
+    padding:22px 16px 6px;
+  }
+  .brand{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:1.5rem;
+    color:var(--chalk);
+    letter-spacing:0.3px;
+  }
+  .brand span{color:var(--kg);}
+
+  /* ---------- Selection page ---------- */
+  #selectPage{
+    max-width:920px;
+    margin:0 auto;
+    padding:10px 24px 60px;
+    text-align:center;
+  }
+  #selectPage h1{
+    font-family:'Baloo 2', sans-serif;
+    font-size:2.4rem;
+    margin:18px 0 4px;
+    color:var(--chalk);
+  }
+  .subtitle{
+    font-size:1.05rem;
+    color:#5b5648;
+    margin-bottom:38px;
+  }
+  .cubby-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:26px;
+  }
+  @media (max-width:640px){
+    .cubby-grid{grid-template-columns:1fr;}
+  }
+  .cubby{
+    position:relative;
+    background:#FFFDF8;
+    border:2px solid var(--ink);
+    border-radius:14px;
+    padding:30px 22px 24px;
+    cursor:pointer;
+    text-align:left;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    box-shadow:6px 6px 0 var(--accent);
+    transition:transform .16s ease, box-shadow .16s ease;
+    font-family:'Nunito', sans-serif;
+  }
+  .cubby:hover{
+    transform:translate(-3px,-3px);
+    box-shadow:9px 9px 0 var(--accent);
+  }
+  .cubby:active{
+    transform:translate(0,0);
+    box-shadow:3px 3px 0 var(--accent);
+  }
+  .peg{
+    position:absolute;
+    top:-14px;left:26px;
+    width:26px;height:26px;
+    background:var(--accent);
+    border:2px solid var(--ink);
+    border-radius:50%;
+  }
+  .cubby .icon{width:54px;height:54px;}
+  .cubby .label{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:1.25rem;
+    color:var(--chalk);
+  }
+  .cubby .desc{
+    font-size:0.92rem;
+    color:#615c4d;
+  }
+  .cubby .tag{
+    align-self:flex-start;
+    margin-top:4px;
+    font-family:'Architects Daughter', cursive;
+    font-size:0.85rem;
+    background:var(--accent);
+    color:#fff;
+    padding:2px 10px;
+    border-radius:20px;
+    transform:rotate(-3deg);
+  }
+
+  /* ---------- Worksheet page ---------- */
+  #worksheetPage{
+    max-width:900px;
+    margin:0 auto;
+    padding:16px 20px 80px;
+  }
+  .worksheet-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .toolbar-right{display:flex;gap:10px;flex-wrap:wrap;}
+  .btn{
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:0.9rem;
+    border:2px solid var(--ink);
+    background:#fff;
+    border-radius:9px;
+    padding:9px 14px;
+    cursor:pointer;
+    box-shadow:3px 3px 0 var(--ink);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink);}
+  .btn:active{transform:translate(0,0);box-shadow:1px 1px 0 var(--ink);}
+  .btn.primary{background:var(--chalk);color:#fff;}
+
+  .worksheet-sheet{
+    background:#fffdf9;
+    border:2px solid var(--ink);
+    border-radius:10px;
+    padding:34px 38px 44px;
+    position:relative;
+  }
+  .sheet-header{
+    display:flex;
+    align-items:center;
+    gap:22px;
+    border-bottom:2px dashed var(--ink);
+    padding-bottom:16px;
+    margin-bottom:22px;
+  }
+  .stamp{
+    flex:0 0 auto;
+    width:96px;height:96px;
+    border-radius:50%;
+    border:3px double var(--accent);
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-family:'Architects Daughter', cursive;
+    font-size:0.95rem;
+    line-height:1.15;
+    transform:rotate(-8deg);
+  }
+  .title-block h2{
+    font-family:'Baloo 2', sans-serif;
+    margin:0 0 8px;
+    color:var(--chalk);
+    font-size:1.6rem;
+  }
+  .name-date-line{
+    display:flex;gap:34px;flex-wrap:wrap;
+    font-weight:700;
+    font-size:0.95rem;
+  }
+  .name-date-line .line{
+    display:inline-block;
+    min-width:150px;
+    border-bottom:2px solid var(--ink);
+    height:1.1em;
+    margin-left:6px;
+    vertical-align:bottom;
+  }
+
+  .section-title{
+    font-family:'Baloo 2', sans-serif;
+    color:var(--accent-dark, var(--chalk));
+    font-size:1.15rem;
+    margin:26px 0 12px;
+    padding-left:10px;
+    border-left:6px solid var(--accent);
+  }
+
+  .problem-grid{
+    display:grid;
+    gap:14px 24px;
+  }
+  .problem-grid.cols-2{grid-template-columns:1fr 1fr;}
+  .problem-grid.cols-3{grid-template-columns:1fr 1fr 1fr;}
+  .problem-grid.cols-4{grid-template-columns:1fr 1fr 1fr 1fr;}
+  @media(max-width:640px){
+    .problem-grid.cols-2,.problem-grid.cols-3,.problem-grid.cols-4{grid-template-columns:1fr 1fr;}
+  }
+
+  .prob{
+    font-size:1.15rem;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#fbf9f3;
+    border:1.5px solid #e4ddc9;
+    border-radius:8px;
+    padding:10px 12px;
+  }
+  .prob-index{
+    font-family:'Baloo 2';
+    font-size:0.85rem;
+    color:#8b8468;
+    width:20px;
+  }
+  .blank{
+    display:inline-block;
+    min-width:38px;
+    height:1.3em;
+    border-bottom:2.5px solid var(--ink);
+    position:relative;
+    text-align:center;
+  }
+  .show-answers .blank::after{
+    content: attr(data-answer);
+    color:var(--g2);
+    font-weight:800;
+  }
+
+  .vert-prob{
+    font-family:'Nunito';
+    font-weight:800;
+    font-size:1.25rem;
+    text-align:right;
+    line-height:1.5;
+    background:#fbf9f3;
+    border:1.5px solid #e4ddc9;
+    border-radius:8px;
+    padding:10px 16px;
+  }
+  .vert-prob .op-row{display:flex;justify-content:space-between;}
+  .vert-prob .rule{border-top:3px solid var(--ink);margin:4px 0;}
+  .vert-prob .ans-row{min-height:1.4em;}
+
+  .word-prob{
+    grid-column:1 / -1;
+    background:#fbf9f3;
+    border:1.5px dashed #c9c0a3;
+    border-radius:8px;
+    padding:14px 16px;
+    font-weight:600;
+    font-size:1.02rem;
+  }
+  .word-prob .blank{margin-left:10px;min-width:90px;}
+
+  .count-row{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .count-row .icons{font-size:1.5rem;letter-spacing:4px;text-align:center;}
+  .count-row .qline{font-size:0.95rem;}
+
+  .trace-row{display:flex;flex-direction:column;gap:4px;align-items:flex-start;}
+  .trace-num{
+    font-family:'Baloo 2';
+    font-size:2.6rem;
+    font-weight:800;
+    color:transparent;
+    -webkit-text-stroke: 1.6px #8b8468;
+  }
+  .trace-line{width:100%;border-bottom:2px dotted #b8b19a;height:1.6em;}
+
+  .shape-cell{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .shape-cell svg{width:60px;height:60px;}
+
+  .clock-cell{display:flex;flex-direction:column;align-items:center;gap:8px;}
+
+  .fraction-cell{display:flex;flex-direction:column;align-items:center;gap:8px;}
+
+  .reveal{display:none;color:var(--g2);font-weight:800;margin-left:10px;}
+  .show-answers .reveal{display:inline-block;}
+
+  .tf-prob{flex-direction:column;align-items:flex-start;gap:8px;}
+  .tf-options{display:flex;gap:16px;font-size:0.95rem;font-weight:700;}
+  .tf-options label{display:flex;align-items:center;gap:5px;cursor:pointer;}
+  .tf-options input{width:16px;height:16px;}
+
+  .mc-options{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
+  .mc-opt{display:flex;align-items:center;gap:8px;font-weight:600;font-size:0.98rem;cursor:pointer;}
+  .mc-letter{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:24px;height:24px;border-radius:50%;
+    border:2px solid var(--ink);font-family:'Baloo 2';font-weight:800;font-size:0.85rem;
+    flex-shrink:0;
+  }
+  .mc-multi-grid{display:flex;flex-direction:column;gap:7px;margin-top:4px;}
+  .mc-multi-grid label{display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;}
+  .mc-multi-grid input{width:17px;height:17px;}
+
+  .maketen-cell{
+    background:#fbf9f3;border:1.5px solid #e4ddc9;border-radius:8px;
+    padding:14px;display:flex;flex-direction:column;gap:10px;
+  }
+  .tenframe-row{display:flex;align-items:center;gap:10px;}
+  .tf-label{font-family:'Baloo 2';font-weight:800;font-size:1.1rem;width:20px;}
+  .maketen-cell .vert-prob{border-top:2px dashed var(--ink);border-left:none;border-right:none;border-bottom:none;border-radius:0;background:transparent;padding:10px 4px 0;margin-top:2px;}
+
+  .tally-table{border-collapse:collapse;width:100%;font-family:'Nunito';font-weight:700;font-size:0.95rem;}
+  .tally-table th,.tally-table td{border:1.5px solid var(--ink);padding:7px 10px;text-align:center;background:#fff;}
+  .tally-table th{background:var(--g2-soft);font-family:'Baloo 2';}
+  .tally-table td:first-child{text-align:left;background:#fffdf8;}
+
+  .two-part{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px;}
+  @media(max-width:640px){.two-part{grid-template-columns:1fr;}}
+  .part-label{font-size:0.82rem;font-weight:700;color:#8b8468;margin-bottom:6px;}
+  .draw-box{border:2px solid var(--ink);border-radius:8px;height:86px;background:#fff;}
+  .equation-line{font-family:'Nunito';font-weight:800;font-size:1.1rem;display:flex;align-items:center;gap:8px;}
+  .word-model-cell{grid-column:1/-1;background:#fbf9f3;border:1.5px dashed #c9c0a3;border-radius:8px;padding:14px 16px;margin-bottom:4px;}
+
+  footer.sheet-footer{
+    margin-top:30px;
+    text-align:center;
+    font-family:'Architects Daughter', cursive;
+    color:#8b8468;
+    font-size:0.9rem;
+  }
+
+  .editable{
+    border-radius:4px;
+    padding:0 3px;
+  }
+  .edit-mode .editable{
+    outline:1.5px dashed var(--g1);
+    background:#fffce8;
+    cursor:text;
+  }
+  .edit-mode .editable:focus{
+    outline:1.5px solid var(--g2);
+    background:#fff;
+  }
+  .edit-mode .section-title{
+    outline:1.5px dashed var(--g1);
+    outline-offset:3px;
+    cursor:text;
+  }
+  .edit-hint{
+    display:none;
+    font-family:'Architects Daughter', cursive;
+    color:var(--g1);
+    font-size:0.95rem;
+    text-align:center;
+    margin:0 0 18px;
+    padding:8px;
+    border:1.5px dashed var(--g1);
+    border-radius:8px;
+    background:#fffce8;
+  }
+  .worksheet-sheet.edit-mode .edit-hint{display:block;}
+
+  @media print{
+    body{background:#fff;}
+    .no-print{display:none !important;}
+    #selectPage{display:none !important;}
+    .worksheet-sheet{border:none;padding:0;}
+    .prob, .vert-prob, .word-prob{background:#fff;border-color:#ccc;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar no-print">
+  <div class="brand">Math Worksheet <span>Cubby</span></div>
+</div>
+
+<section id="selectPage">
+  <h1>Pick Your Grade</h1>
+  <p class="subtitle">Choose a shelf to start today's worksheet</p>
+  <div class="cubby-grid">
+
+    <button class="cubby" data-grade="kg" style="--accent:var(--kg)">
+      <span class="peg"></span>
+      <svg class="icon" viewBox="0 0 64 64"><rect x="6" y="30" width="20" height="20" rx="3" fill="var(--kg-soft)" stroke="#2B2A26" stroke-width="2.5"/><circle cx="46" cy="40" r="12" fill="var(--kg-soft)" stroke="#2B2A26" stroke-width="2.5"/><text x="16" y="44" font-family="Baloo 2" font-size="14" font-weight="800">A</text><text x="41" y="45" font-family="Baloo 2" font-size="14" font-weight="800">3</text></svg>
+      <span class="label">Kindergarten</span>
+      <span class="desc">Counting, shapes &amp; first numbers</span>
+      <span class="tag">ages 4–5</span>
+    </button>
+
+    <button class="cubby" data-grade="grade1" style="--accent:var(--g1)">
+      <span class="peg"></span>
+      <svg class="icon" viewBox="0 0 64 64"><rect x="6" y="10" width="52" height="14" rx="3" fill="var(--g1-soft)" stroke="#2B2A26" stroke-width="2.5"/><rect x="6" y="30" width="26" height="14" rx="3" fill="var(--g1-soft)" stroke="#2B2A26" stroke-width="2.5"/><text x="12" y="41" font-family="Baloo 2" font-size="13" font-weight="800">+7</text></svg>
+      <span class="label">Grade 1</span>
+      <span class="desc">Addition &amp; subtraction to 20</span>
+      <span class="tag">ages 6–7</span>
+    </button>
+
+    <button class="cubby" data-grade="grade2" style="--accent:var(--g2)">
+      <span class="peg"></span>
+      <svg class="icon" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="var(--g2-soft)" stroke="#2B2A26" stroke-width="2.5"/><line x1="32" y1="32" x2="32" y2="18" stroke="#2B2A26" stroke-width="2.5" stroke-linecap="round"/><line x1="32" y1="32" x2="43" y2="38" stroke="#2B2A26" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <span class="label">Grade 2</span>
+      <span class="desc">Addition &amp; subtraction strategies to 20</span>
+      <span class="tag">ages 7–8</span>
+    </button>
+
+    <button class="cubby" data-grade="grade3" style="--accent:var(--g3)">
+      <span class="peg"></span>
+      <svg class="icon" viewBox="0 0 64 64"><rect x="8" y="8" width="48" height="48" fill="none" stroke="#2B2A26" stroke-width="2.5"/><line x1="24" y1="8" x2="24" y2="56" stroke="#2B2A26" stroke-width="1.5"/><line x1="40" y1="8" x2="40" y2="56" stroke="#2B2A26" stroke-width="1.5"/><line x1="8" y1="24" x2="56" y2="24" stroke="#2B2A26" stroke-width="1.5"/><line x1="8" y1="40" x2="56" y2="40" stroke="#2B2A26" stroke-width="1.5"/><rect x="8" y="8" width="16" height="16" fill="var(--g3-soft)"/></svg>
+      <span class="label">Grade 3</span>
+      <span class="desc">Multiplication, fractions &amp; rounding</span>
+      <span class="tag">ages 8–9</span>
+    </button>
+
+  </div>
+</section>
+
+<section id="worksheetPage" class="hidden">
+  <div class="worksheet-toolbar no-print">
+    <button class="btn" id="backBtn">← Back to grades</button>
+    <div class="toolbar-right">
+      <button class="btn" id="regenBtn">🔄 New worksheet</button>
+      <button class="btn" id="editBtn">✏️ Edit questions</button>
+      <button class="btn" id="answerBtn">👁 Show answers</button>
+      <button class="btn primary" id="printBtn">🖨 Print</button>
+    </div>
+  </div>
+  <div class="worksheet-sheet" id="sheet"></div>
+</section>
+
+<script>
+const GRADE_INFO = {
+  kg:     {title:"Kindergarten Math Practice", accent:"var(--kg)",  stamp:"KG\\nCLASS"},
+  grade1: {title:"Grade 1 Math Practice",      accent:"var(--g1)",  stamp:"GRADE 1\\nCLASS"},
+  grade2: {title:"Grade 2 Math Practice",      accent:"var(--g2)",  stamp:"GRADE 2\\nCLASS"},
+  grade3: {title:"Grade 3 Math Practice",      accent:"var(--g3)",  stamp:"GRADE 3\\nCLASS"},
+};
+
+let currentGrade = null;
+let editMode = false;
+
+function applyEditMode(){
+  const sheet = document.getElementById('sheet');
+  sheet.classList.toggle('edit-mode', editMode);
+  sheet.querySelectorAll('.editable').forEach(el=> el.setAttribute('contenteditable', editMode ? 'true' : 'false'));
+  sheet.querySelectorAll('.section-title').forEach(el=> el.setAttribute('contenteditable', editMode ? 'true' : 'false'));
+  document.getElementById('editBtn').textContent = editMode ? '✅ Done editing' : '✏️ Edit questions';
+}
+
+function rnd(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function shuffle(a){ const arr=a.slice(); for(let i=arr.length-1;i>0;i--){const j=rnd(0,i);[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+function blank(ans){ return `<span class="blank" data-answer="${ans}"></span>`; }
+function reveal(text){ return `<span class="reveal">${text}</span>`; }
+function tenFrameSVG(n){
+  let cells='';
+  for(let i=0;i<10;i++){
+    const row=Math.floor(i/5), col=i%5;
+    const x=col*26, y=row*26;
+    const filled = i<n;
+    cells += `<rect x="${x}" y="${y}" width="24" height="24" rx="3" fill="${filled?'#E15B4F':'#fff'}" stroke="#2B2A26" stroke-width="1.5"/>`;
+  }
+  return `<svg viewBox="0 0 130 52" width="120" height="48">${cells}</svg>`;
+}
+
+/* ---------- SVG helpers ---------- */
+function shapeSVG(kind){
+  const s = 'stroke="#2B2A26" stroke-width="3" fill="#F7F4EC"';
+  switch(kind){
+    case 'circle': return `<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="24" ${s}/></svg>`;
+    case 'square': return `<svg viewBox="0 0 60 60"><rect x="8" y="8" width="44" height="44" ${s}/></svg>`;
+    case 'triangle': return `<svg viewBox="0 0 60 60"><polygon points="30,8 54,52 6,52" ${s}/></svg>`;
+    case 'rectangle': return `<svg viewBox="0 0 60 60"><rect x="4" y="16" width="52" height="28" ${s}/></svg>`;
+    case 'star': return `<svg viewBox="0 0 60 60"><polygon points="30,4 37,22 56,22 41,34 47,53 30,41 13,53 19,34 4,22 23,22" ${s}/></svg>`;
+    case 'heart': return `<svg viewBox="0 0 60 60"><path d="M30 50 C 6 32, 6 12, 22 12 C 28 12 30 18 30 18 C 30 18 32 12 38 12 C 54 12 54 32 30 50 Z" ${s}/></svg>`;
+  }
+}
+function clockSVG(hour, minute){
+  const hourAngle = ((hour%12)+minute/60)*30;
+  const minAngle = minute*6;
+  let ticks='';
+  for(let i=0;i<12;i++){
+    const a = i*30*Math.PI/180;
+    const x1=30+24*Math.sin(a), y1=30-24*Math.cos(a);
+    const x2=30+20*Math.sin(a), y2=30-20*Math.cos(a);
+    ticks += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#2B2A26" stroke-width="1.5"/>`;
+  }
+  return `<svg viewBox="0 0 60 60" width="90" height="90">
+    <circle cx="30" cy="30" r="27" fill="#fff" stroke="#2B2A26" stroke-width="3"/>
+    ${ticks}
+    <line x1="30" y1="30" x2="${30+13*Math.sin(hourAngle*Math.PI/180)}" y2="${30-13*Math.cos(hourAngle*Math.PI/180)}" stroke="#2B2A26" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="30" y1="30" x2="${30+20*Math.sin(minAngle*Math.PI/180)}" y2="${30-20*Math.cos(minAngle*Math.PI/180)}" stroke="#E15B4F" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="30" cy="30" r="2" fill="#2B2A26"/>
+  </svg>`;
+}
+function fractionBarSVG(num, den){
+  const w=140,h=40, seg=w/den;
+  let rects='';
+  for(let i=0;i<den;i++){
+    rects += `<rect x="${i*seg}" y="0" width="${seg}" height="${h}" fill="${i<num?'#7458B5':'#fff'}" stroke="#2B2A26" stroke-width="2"/>`;
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" width="150" height="44">${rects}</svg>`;
+}
+
+/* ---------- Problem generators ---------- */
+function genKG(){
+  const icons = ['⭐','🍎','🐸','🎈','🚗'];
+  const countItems = Array.from({length:6}, ()=>{
+    const n = rnd(1,10);
+    const icon = icons[rnd(0,icons.length-1)];
+    return {icons: icon.repeat(n), answer:n};
+  });
+
+  const compareItems = Array.from({length:6}, ()=>{
+    let a=rnd(1,10), b=rnd(1,10);
+    while(a===b) b=rnd(1,10);
+    return {a,b,answer:a>b?a:b};
+  });
+
+  const traceItems = [1,2,3,4,5,6,7,8,9,10];
+
+  const shapeItems = shuffle(['circle','square','triangle','rectangle','star','heart']);
+
+  const addItems = Array.from({length:6}, ()=>{
+    const a=rnd(1,3), b=rnd(1,2);
+    return {a,b,answer:a+b, icon: icons[rnd(0,icons.length-1)]};
+  });
+
+  return [
+    {title:"Count and Write", type:"count", items:countItems},
+    {title:"Circle the Bigger Number", type:"compare-circle", items:compareItems},
+    {title:"Trace and Write the Numbers", type:"trace", items:traceItems},
+    {title:"Name the Shape", type:"shape", items:shapeItems},
+    {title:"Picture Addition", type:"pic-add", items:addItems},
+  ];
+}
+
+function genGrade1(){
+  const add = Array.from({length:10}, ()=>{
+    const a=rnd(1,15), b=rnd(1,20-a);
+    return {a,b,op:'+',answer:a+b};
+  });
+  const sub = Array.from({length:10}, ()=>{
+    const a=rnd(5,20), b=rnd(0,a);
+    return {a,b,op:'-',answer:a-b};
+  });
+  const missing = Array.from({length:6}, ()=>{
+    const total=rnd(5,20), a=rnd(1,total-1);
+    return {a, total, answer: total-a};
+  });
+  const skips = [
+    {start:2, step:2, count:8},
+    {start:5, step:5, count:8},
+    {start:10, step:10, count:6},
+  ];
+  const compare = Array.from({length:6}, ()=>{
+    let a=rnd(1,20), b=rnd(1,20);
+    while(a===b) b=rnd(1,20);
+    return {a,b, answer: a>b?'>':'<'};
+  });
+  const names=['Mia','Jaden','Priya','Sam','Lucia','Omar'];
+  const objs=['apples','marbles','stickers','crayons','balloons'];
+  const words = Array.from({length:2}, ()=>{
+    const name=names[rnd(0,names.length-1)], obj=objs[rnd(0,objs.length-1)];
+    const a=rnd(3,12), b=rnd(1,7);
+    return {text:`${name} has ${a} ${obj}. A friend gives ${name} ${b} more. How many ${obj} does ${name} have now?`, answer:a+b};
+  });
+
+  return [
+    {title:"Addition to 20", type:"horizontal", items:add},
+    {title:"Subtraction to 20", type:"horizontal", items:sub},
+    {title:"Missing Number", type:"missing", items:missing},
+    {title:"Skip Counting", type:"skip", items:skips},
+    {title:"Compare Numbers", type:"compare-symbol", items:compare},
+    {title:"Word Problems", type:"word", items:words},
+  ];
+}
+
+function genFactEquation(){
+  const op = rnd(0,1)===0 ? '+' : '-';
+  let a,b,answer;
+  if(op==='+'){ a=rnd(2,16); b=rnd(1,18-a); answer=a+b; }
+  else { a=rnd(6,18); b=rnd(1,a-1); answer=a-b; }
+  return {a,b,op,answer};
+}
+
+function genGrade2(){
+  const facts = Array.from({length:8}, genFactEquation);
+
+  const truefalse = Array.from({length:6}, ()=>{
+    const {a,b,op,answer} = genFactEquation();
+    const makeTrue = Math.random()<0.5;
+    const shown = makeTrue ? answer : Math.max(0, answer + (Math.random()<0.5?-1:1)*rnd(1,2));
+    return {a,b,op,shown,isTrue: shown===answer};
+  });
+
+  const mcNames=['Nita','Omar','Lena','Theo','Priya','Caleb'];
+  const mcObjs=['grapes','stickers','marbles','buttons','shells'];
+  const mcSingle = Array.from({length:3}, ()=>{
+    const name=mcNames[rnd(0,mcNames.length-1)], obj=mcObjs[rnd(0,mcObjs.length-1)];
+    const start=rnd(11,18), taken=rnd(3,9), left=start-taken;
+    const prompt = `${name} has ${start} ${obj}. ${name} uses ${taken} ${obj}. Which addition fact helps find how many ${obj} ${name} has left?`;
+    const correct = {text:`${taken} + ${left} = ${start}`, isCorrect:true};
+    const d1 = {text:`${taken} + ${left+1} = ${start+1}`, isCorrect:false};
+    const d2 = {text:`${taken} + ${Math.max(left-1,0)} = ${start-1}`, isCorrect:false};
+    const d3 = {text:`${left} + ${left} = ${left*2}`, isCorrect:false};
+    return {prompt, options:shuffle([correct,d1,d2,d3])};
+  });
+
+  const mcMulti = Array.from({length:2}, ()=>{
+    const target = rnd(12,18);
+    const p = rnd(Math.max(2,target-14), Math.min(14,target-2));
+    const q = target-p;
+    const correctPairs = [{a:p,b:q},{a:q,b:p}];
+    if(target%2===0 && target/2!==p && target/2!==q) correctPairs.push({a:target/2,b:target/2});
+    const d1 = {a:p, b: q>2 ? q-1 : q+1};
+    const d2 = {a: p<14 ? p+1 : p-1, b:q};
+    const options = shuffle([
+      ...correctPairs.map(o=>({label:`${o.a} + ${o.b}`, isCorrect:true})),
+      {label:`${d1.a} + ${d1.b}`, isCorrect:false},
+      {label:`${d2.a} + ${d2.b}`, isCorrect:false},
+    ]);
+    return {target, options};
+  });
+
+  const makeTen = Array.from({length:4}, ()=>{
+    const a = rnd(6,9);
+    const b = rnd((10-a)+1, 9);
+    return {a,b};
+  });
+
+  const catPool = [['Horses','Cats','Dogs'],['Apples','Bananas','Grapes'],['Red','Blue','Green']];
+  const namePool=['Brian','Fernando','Laurel','Maya','Theo','Nina'];
+  const table3 = [{
+    cats: catPool[rnd(0,catPool.length-1)],
+    friends: shuffle(namePool).slice(0,3).map(name=>({name, vals:[rnd(1,9),rnd(0,9),rnd(0,9)]})),
+  }];
+
+  const wmNames=['Josh','Gail','Priya','Marcus','Elena','Theo'];
+  const wmObjs=['cherries','stickers','marbles','baseball cards','seashells'];
+  function wmCompare(){
+    const name1=wmNames[rnd(0,wmNames.length-1)]; let name2=wmNames[rnd(0,wmNames.length-1)]; while(name2===name1) name2=wmNames[rnd(0,wmNames.length-1)];
+    const obj=wmObjs[rnd(0,wmObjs.length-1)];
+    const total=rnd(10,18), diff=rnd(2,7);
+    return {text:`${name1} ate ${diff} fewer ${obj} than ${name2}. ${name2} ate ${total} ${obj}. How many ${obj} did ${name1} eat?`, op:'−', answer: total-diff};
+  }
+  function wmStartUnknown(){
+    const name=wmNames[rnd(0,wmNames.length-1)], obj=wmObjs[rnd(0,wmObjs.length-1)];
+    const given=rnd(3,9), left=rnd(5,12);
+    return {text:`${name} has some ${obj}. ${name} gives ${given} ${obj} to a friend. Now ${name} has ${left} ${obj}. How many ${obj} did ${name} have at first?`, op:'+', answer: given+left};
+  }
+  function wmThreeAddend(){
+    const name=wmNames[rnd(0,wmNames.length-1)], obj=wmObjs[rnd(0,wmObjs.length-1)];
+    const a=rnd(2,7), b=rnd(1,6), c=rnd(1,6);
+    return {text:`${name} found ${a} ${obj}, then found ${b} more, then found ${c} more. How many ${obj} did ${name} find in all?`, op:'+', answer:a+b+c};
+  }
+  const wmGenerators = shuffle([wmCompare, wmStartUnknown, wmThreeAddend]).slice(0,2);
+  const wordModel = wmGenerators.map(fn=>fn());
+
+  return [
+    {title:"Addition & Subtraction to 20", type:"horizontal", items:facts},
+    {title:"True or False?", type:"truefalse", items:truefalse},
+    {title:"Which Fact Helps?", type:"mc-single", items:mcSingle},
+    {title:"Choose All That Apply", type:"mc-multi", items:mcMulti},
+    {title:"Make a Ten", type:"make-ten", items:makeTen},
+    {title:"Friends and Their Pictures", type:"table3", items:table3},
+    {title:"Word Problems: Draw and Solve", type:"word-model", items:wordModel},
+  ];
+}
+
+function genGrade3(){
+  const mult = Array.from({length:12}, ()=>{
+    const a=rnd(2,10), b=rnd(2,10);
+    return {a,b,op:'×',answer:a*b};
+  });
+  const div = Array.from({length:10}, ()=>{
+    const b=rnd(2,10), q=rnd(2,10), a=b*q;
+    return {a,b,op:'÷',answer:q};
+  });
+  const addsub = [
+    ...Array.from({length:3}, ()=>{
+      const a=rnd(150,700), b=rnd(150,999-a);
+      return {a,b,op:'+',answer:a+b};
+    }),
+    ...Array.from({length:3}, ()=>{
+      const a=rnd(300,999), b=rnd(100,a);
+      return {a,b,op:'-',answer:a-b};
+    }),
+  ];
+  const fractions = Array.from({length:6}, ()=>{
+    const den=[2,3,4,5,6,8][rnd(0,5)];
+    const num=rnd(1,den-1);
+    return {num, den};
+  });
+  const rounding = Array.from({length:6}, ()=>{
+    const toNearest = rnd(0,1)===0?10:100;
+    const n = rnd(11, 989);
+    const answer = Math.round(n/toNearest)*toNearest;
+    return {n, toNearest, answer};
+  });
+  const names=['Diego','Nadia','Wei','Fatima','Owen','Sofia'];
+  const words = Array.from({length:2}, ()=>{
+    const name=names[rnd(0,names.length-1)];
+    const rows=rnd(3,9), cols=rnd(3,9);
+    return {text:`${name} is setting up chairs in ${rows} rows with ${cols} chairs in each row. How many chairs in total?`, answer:rows*cols};
+  });
+
+  return [
+    {title:"Multiplication Facts", type:"horizontal", items:mult},
+    {title:"Division Facts", type:"horizontal", items:div},
+    {title:"Addition & Subtraction to 1000", type:"vertical", items:addsub},
+    {title:"Name the Fraction", type:"fraction", items:fractions},
+    {title:"Round the Number", type:"rounding", items:rounding},
+    {title:"Word Problems", type:"word", items:words},
+  ];
+}
+
+const GENERATORS = {kg: genKG, grade1: genGrade1, grade2: genGrade2, grade3: genGrade3};
+
+/* ---------- Renderers ---------- */
+function renderSection(sec){
+  let inner = '';
+  switch(sec.type){
+    case 'count':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map((it,i)=>`
+        <div class="count-row">
+          <div class="icons"><span class="editable">${it.icons}</span></div>
+          <div class="qline">How many? ${blank(it.answer)}</div>
+        </div>`).join('') + `</div>`;
+      break;
+    case 'compare-circle':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map(it=>`
+        <div class="prob"><span class="editable">${it.a}</span> &nbsp; <span class="editable">${it.b}</span></div>`).join('') + `</div>
+        <p style="font-family:'Architects Daughter';color:#8b8468;margin-top:6px;">Circle the number that is bigger in each pair.</p>`;
+      break;
+    case 'trace':
+      inner = `<div class="problem-grid cols-4">` + sec.items.map(n=>`
+        <div class="trace-row">
+          <div class="trace-num">${n}</div>
+          <div class="trace-line"></div>
+        </div>`).join('') + `</div>`;
+      break;
+    case 'shape':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map(kind=>`
+        <div class="shape-cell">
+          ${shapeSVG(kind)}
+          <span class="qline">This shape is a ${blank(kind)}</span>
+        </div>`).join('') + `</div>`;
+      break;
+    case 'pic-add':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map(it=>`
+        <div class="count-row">
+          <div class="icons"><span class="editable">${it.icon.repeat(it.a)}</span> + <span class="editable">${it.icon.repeat(it.b)}</span></div>
+          <div class="qline">= ${blank(it.answer)}</div>
+        </div>`).join('') + `</div>`;
+      break;
+    case 'horizontal':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map((it,i)=>`
+        <div class="prob"><span class="prob-index">${i+1}.</span> <span class="editable">${it.a}</span> ${it.op} <span class="editable">${it.b}</span> = ${blank(it.answer)}</div>`).join('') + `</div>`;
+      break;
+    case 'vertical':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map(it=>`
+        <div class="vert-prob">
+          <div><span class="editable">${it.a}</span></div>
+          <div class="op-row"><span>${it.op}</span><span class="editable">${it.b}</span></div>
+          <div class="rule"></div>
+          <div class="ans-row">${blank(it.answer)}</div>
+        </div>`).join('') + `</div>`;
+      break;
+    case 'missing':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map(it=>`
+        <div class="prob"><span class="editable">${it.a}</span> + ${blank(it.answer)} = <span class="editable">${it.total}</span></div>`).join('') + `</div>`;
+      break;
+    case 'skip':
+      inner = sec.items.map(seq=>{
+        let nums=[];
+        for(let i=0;i<seq.count;i++) nums.push(seq.start+i*seq.step);
+        const shown = nums.map((n,i)=> i%3===2 ? blank(n) : `<span class="editable">${n}</span>`);
+        return `<div class="prob" style="grid-column:1/-1;">${shown.join(' , &nbsp; ')}</div>`;
+      }).join('');
+      inner = `<div class="problem-grid cols-2">${inner}</div>`;
+      break;
+    case 'compare-symbol':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map(it=>`
+        <div class="prob"><span class="editable">${it.a}</span> ${blank(it.answer)} <span class="editable">${it.b}</span></div>`).join('') + `</div>
+        <p style="font-family:'Architects Daughter';color:#8b8468;margin-top:6px;">Write &gt;, &lt;, or = in the blank.</p>`;
+      break;
+    case 'place-value':
+      inner = `<div class="problem-grid cols-2">` + sec.items.map(it=>`
+        <div class="prob" style="flex-direction:column;align-items:flex-start;">
+          <div><span class="editable">${it.n}</span></div>
+          <div style="font-size:0.95rem;font-weight:600;">Tens: ${blank(it.tens)} &nbsp; Ones: ${blank(it.ones)}</div>
+        </div>`).join('') + `</div>`;
+      break;
+    case 'clock':
+      inner = `<div class="problem-grid cols-4">` + sec.items.map(it=>`
+        <div class="clock-cell">
+          ${clockSVG(it.hour,it.minute)}
+          <span class="qline">${blank(it.answer)}</span>
+        </div>`).join('') + `</div>`;
+      break;
+    case 'fraction':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map(it=>`
+        <div class="fraction-cell">
+          ${fractionBarSVG(it.num,it.den)}
+          <span class="qline">Fraction shaded: ${blank(it.num+'/'+it.den)}</span>
+        </div>`).join('') + `</div>`;
+      break;
+    case 'rounding':
+      inner = `<div class="problem-grid cols-3">` + sec.items.map(it=>`
+        <div class="prob" style="flex-direction:column;align-items:flex-start;">
+          <div><span class="editable">${it.n}</span></div>
+          <div style="font-size:0.9rem;">Nearest ${it.toNearest}: ${blank(it.answer)}</div>
+        </div>`).join('') + `</div>`;
+      break;
+    case 'word':
+      inner = sec.items.map((it,i)=>`
+        <div class="word-prob">${i+1}. <span class="editable">${it.text}</span> &nbsp; Answer: ${blank(it.answer)}</div>`).join('');
+      inner = `<div class="problem-grid cols-2">${inner}</div>`;
+      break;
+    case 'truefalse':
+      inner = `<div class="problem-grid cols-2">` + sec.items.map((it,i)=>`
+        <div class="prob tf-prob">
+          <span><span class="editable">${it.a}</span> ${it.op} <span class="editable">${it.b}</span> = <span class="editable">${it.shown}</span></span>
+          <span class="tf-options">
+            <label><input type="radio" name="tf${i}"> Yes</label>
+            <label><input type="radio" name="tf${i}"> No</label>
+          </span>
+          ${reveal(it.isTrue ? 'Answer: Yes' : 'Answer: No')}
+        </div>`).join('') + `</div>`;
+      break;
+    case 'mc-single':
+      inner = sec.items.map((it,i)=>`
+        <div class="word-model-cell">
+          <div class="word-prob" style="border:none;padding:0 0 8px;">${i+1}. <span class="editable">${it.prompt}</span></div>
+          <div class="mc-options">` + it.options.map((opt,oi)=>`
+            <label class="mc-opt"><span class="mc-letter">${String.fromCharCode(65+oi)}</span> <span class="editable">${opt.text}</span></label>`).join('') + `
+          </div>
+          ${reveal('Correct answer: ' + String.fromCharCode(65 + it.options.findIndex(o=>o.isCorrect)))}
+        </div>`).join('');
+      break;
+    case 'mc-multi':
+      inner = sec.items.map((it,i)=>`
+        <div class="word-model-cell">
+          <div class="word-prob" style="border:none;padding:0 0 8px;">${i+1}. Which have a sum of <span class="editable">${it.target}</span>? Choose all that apply.</div>
+          <div class="mc-multi-grid">` + it.options.map(opt=>`
+            <label><input type="checkbox"> <span class="editable">${opt.label}</span> ${reveal(opt.isCorrect?'✓ correct':'')}</label>`).join('') + `
+          </div>
+        </div>`).join('');
+      break;
+    case 'make-ten':
+      inner = `<div class="problem-grid cols-2">` + sec.items.map(it=>{
+        const remainder = it.b - (10 - it.a);
+        return `
+        <div class="maketen-cell">
+          <div class="tenframe-row"><div class="tf-label">${it.a}</div>${tenFrameSVG(it.a)}</div>
+          <div class="tenframe-row"><div class="tf-label">${it.b}</div>${tenFrameSVG(it.b)}</div>
+          <div class="vert-prob">
+            <div>10</div>
+            <div class="op-row"><span>+</span>${blank(remainder)}</div>
+            <div class="rule"></div>
+            <div class="ans-row">${blank(it.a + it.b)}</div>
+          </div>
+        </div>`;
+      }).join('') + `</div>`;
+      break;
+    case 'table3':
+      inner = sec.items.map(t=>`
+        <table class="tally-table">
+          <thead><tr><th></th>${t.cats.map(c=>`<th class="editable">${c}</th>`).join('')}</tr></thead>
+          <tbody>${t.friends.map(f=>`<tr><td class="editable">${f.name}</td>${f.vals.map(v=>`<td class="editable">${v}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+        <div class="word-prob" style="margin-top:14px;">
+          Choose one friend. Write the name: <span class="blank" style="min-width:110px;"></span>
+          <br><br>
+          Write an equation to find their total: <span class="blank"></span> + <span class="blank"></span> + <span class="blank"></span> = ${blank(t.friends[0].vals.reduce((s,v)=>s+v,0))}
+          ${reveal('Example — ' + t.friends[0].name + ': ' + t.friends[0].vals.join(' + ') + ' = ' + t.friends[0].vals.reduce((s,v)=>s+v,0))}
+        </div>`).join('');
+      break;
+    case 'word-model':
+      inner = sec.items.map((it,i)=>`
+        <div class="word-model-cell">
+          <div class="word-prob" style="border:none;padding:0 0 4px;">${i+1}. <span class="editable">${it.text}</span></div>
+          <div class="two-part">
+            <div>
+              <div class="part-label">Part A — Draw a picture to model the problem.</div>
+              <div class="draw-box"></div>
+            </div>
+            <div>
+              <div class="part-label">Part B — Write an equation to solve.</div>
+              <div class="equation-line"><span class="blank"></span> ${it.op} <span class="blank"></span> = ${blank(it.answer)}</div>
+            </div>
+          </div>
+        </div>`).join('');
+      break;
+  }
+  return `<h3 class="section-title" style="--accent:${GRADE_INFO[currentGrade].accent}">${sec.title}</h3>${inner}`;
+}
+
+function renderWorksheet(){
+  const info = GRADE_INFO[currentGrade];
+  const sections = GENERATORS[currentGrade]();
+  const sheet = document.getElementById('sheet');
+  sheet.innerHTML = `
+    <div class="edit-hint">✏️ Edit mode is on — click any number or word-problem text to change it.</div>
+    <div class="sheet-header">
+      <div class="stamp" style="--accent:${info.accent}">${info.stamp.split('\\n').join('<br>')}</div>
+      <div class="title-block">
+        <h2>${info.title}</h2>
+        <div class="name-date-line">
+          <span>Name: <span class="line"></span></span>
+          <span>Date: <span class="line"></span></span>
+        </div>
+      </div>
+    </div>
+    ${sections.map(renderSection).join('')}
+    <footer class="sheet-footer">Great work! Keep practicing every day. ✏️</footer>
+  `;
+  sheet.classList.remove('show-answers');
+  document.getElementById('answerBtn').textContent = '👁 Show answers';
+  applyEditMode();
+}
+
+function showWorksheet(grade){
+  currentGrade = grade;
+  document.getElementById('selectPage').classList.add('hidden');
+  document.getElementById('worksheetPage').classList.remove('hidden');
+  renderWorksheet();
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll('.cubby').forEach(btn=>{
+  btn.addEventListener('click', ()=> showWorksheet(btn.dataset.grade));
+});
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  document.getElementById('worksheetPage').classList.add('hidden');
+  document.getElementById('selectPage').classList.remove('hidden');
+});
+document.getElementById('regenBtn').addEventListener('click', ()=>{ editMode=false; renderWorksheet(); });
+document.getElementById('editBtn').addEventListener('click', ()=>{
+  editMode = !editMode;
+  applyEditMode();
+});
+document.getElementById('answerBtn').addEventListener('click', ()=>{
+  const sheet = document.getElementById('sheet');
+  const showing = sheet.classList.toggle('show-answers');
+  document.getElementById('answerBtn').textContent = showing ? '🙈 Hide answers' : '👁 Show answers';
+});
+document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+</script>
+</body>
+</html>
